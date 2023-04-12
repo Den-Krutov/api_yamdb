@@ -11,6 +11,7 @@ class Title(models.Model):
 
 
 class Review(models.Model):
+    """Модель отзыва на произведение."""
     title = models.ForeignKey(
         Title,
         verbose_name='Произведение',
@@ -28,14 +29,14 @@ class Review(models.Model):
         related_name='reviews'
     )
     score = models.IntegerField(
-        verbose_name='Оценка',
+        verbose_name='Оценка произведения',
         validators=[
             MinValueValidator(1, 'Выберите оценку от 1 до 10'),
             MaxValueValidator(10, 'Выберите оценку от 1 до 10')
         ]
     )
     pub_date = models.DateTimeField(
-        verbose_name='Дата публикации',
+        verbose_name='Дата публикации отзыва',
         auto_now_add=True
     )
 
