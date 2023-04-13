@@ -8,10 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'username']
 
-    def save(self, **kwargs):
-        user = User(
-            email=self.validated_data['email'],
-            username=self.validated_data['username'],
-        )
-        user.save()
-        return user
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError('username не может быть me')
+        return value
