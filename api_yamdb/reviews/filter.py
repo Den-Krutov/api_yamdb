@@ -1,14 +1,14 @@
 from rest_framework import generics
-from .models import Works
-from .serializers import WorkSerializer
+from api_yamdb.reviews.models import Title
+from api_yamdb.api.serializers import WorkSerializer
 
 
 # Выполняем проверку по slug.
-class WorkList(generics.ListAPIView):
+class TitleList(generics.ListAPIView):
     serializer_class = WorkSerializer
 
     def get_queryset(self):
-        queryset = Works.objects.all()
+        queryset = Title.objects.all()
         category_slug = self.request.query_params.get('category', None)
         if category_slug is not None:
             queryset = queryset.filter(category__slug=category_slug)
