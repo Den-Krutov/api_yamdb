@@ -153,11 +153,11 @@ def check_permissions(client, url, data, user_role, objects,
 def create_single_review(client, title_id, text, score):
     data = {'text': text, 'score': score}
     response = client.post(
-        f'/api/v1/titles/{title_id}/Works/', data=data
+        f'/api/v1/titles/{title_id}/reviews/', data=data
     )
     assert response.status_code == HTTPStatus.CREATED, (
         'Если POST-запрос авторизованного пользователя к '
-        '`/api/v1/titles/{title_id}/Works/` содержит корректные данные - '
+        '`/api/v1/titles/{title_id}/reviews/` содержит корректные данные - '
         'должен вернуться ответ со статусом 201.'
     )
     return response
@@ -166,12 +166,12 @@ def create_single_review(client, title_id, text, score):
 def create_single_comment(client, title_id, review_id, text):
     data = {'text': text}
     response = client.post(
-        f'/api/v1/titles/{title_id}/Works/{review_id}/comments/',
+        f'/api/v1/titles/{title_id}/reviews/{review_id}/comments/',
         data=data
     )
     assert response.status_code == HTTPStatus.CREATED, (
         'Если POST-запрос авторизованного пользователя к '
-        '`/api/v1/titles/{title_id}/Works/{review_id}/comments/` содержит '
+        '`/api/v1/titles/{title_id}/reviews/{review_id}/comments/` содержит '
         'корректные данные - должен вернуться ответ со статусом 201.'
     )
     return response
