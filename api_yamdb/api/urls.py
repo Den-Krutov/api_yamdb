@@ -3,16 +3,16 @@ from rest_framework.routers import DefaultRouter
 
 from api.views import ReviewViewSet, CommentViewSet
 
-router = DefaultRouter()
+router_v1 = DefaultRouter()
 
-router.register(
+router_v1.register(
     'titles/(?P<title_id>\\d+)/reviews', ReviewViewSet, basename='reviews')
-router.register(
+router_v1.register(
     'titles/(?P<title_id>\\d+)/reviews/(?P<review_id>\\d+)/comments',
     CommentViewSet,
     basename='comments'
 )
 
 urlpatterns = [
-    path('v1/', include(router.urls)),
+    path('v1/', include(router_v1.urls)),
 ]
