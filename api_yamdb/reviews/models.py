@@ -22,10 +22,9 @@ class Categories(models.Model):
 # Модель для произведений.
 class Title(models.Model):
     name = models.CharField(max_length=256)
-    year = models.DateTimeField()
+    year = models.IntegerField()
     categories = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True)
-    titles_id = models.IntegerField()
     description = models.CharField(max_length=256)
 
     def __str__(self):
