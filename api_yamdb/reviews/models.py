@@ -7,7 +7,11 @@ class User(models.Model):
 
 
 class Title(models.Model):
-    pass
+    rating = models.IntegerField(
+        verbose_name='Рейтинг (средняя оценка)',
+        null=True,
+        default=None
+    )
 
 
 class Review(models.Model):

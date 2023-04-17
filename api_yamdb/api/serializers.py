@@ -60,4 +60,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Title
         fields = '__all__'
