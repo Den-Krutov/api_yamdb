@@ -11,6 +11,4 @@ routers_v1.register(r'categories', CategoriesViewSet, basename='categories'),
 
 urlpatterns = [
     path('v1/', include(routers_v1.urls)),
-    path('v2/', include(routers_v1.urls)),
-    path('v3/', include(routers_v1.urls)),
 ]

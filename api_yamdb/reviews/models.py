@@ -1,7 +1,6 @@
 from django.db import models
 
 
-# Модель для приложений.
 class Genre(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50)
@@ -10,7 +9,6 @@ class Genre(models.Model):
         return self.name
 
 
-# Модель для категорий.
 class Categories(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50)
@@ -19,7 +17,6 @@ class Categories(models.Model):
         return self.name
 
 
-# Модель для произведений.
 class Title(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
