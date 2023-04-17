@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 
-from reviews.models import Review, Title
+from reviews.models import Review, Title, Comment
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -45,3 +45,19 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Допустимый диапазон оценки:'
                                               'от 1 до 10')
         return value
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Comment."""
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
+    review = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='text'
+    )
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
