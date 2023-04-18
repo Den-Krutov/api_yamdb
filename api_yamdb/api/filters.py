@@ -3,7 +3,6 @@ from api_yamdb.reviews.models import Title
 from api_yamdb.api.serializers import TitleSerializer
 
 
-# Выполняем проверку по slug.
 class TitleList(generics.ListAPIView):
     serializer_class = TitleSerializer
 
