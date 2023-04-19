@@ -9,6 +9,7 @@ from .serializers import (
     UserSerializer, TitleSerializer, GenreSerializer, CategoriesSerializer,
     ReviewSerializer, CommentSerializer)
 from reviews.models import User, Title, Genre, Categories, Review
+from .utils import send_confim_code
 
 
 class SignUpView(CreateAPIView):
@@ -18,11 +19,14 @@ class SignUpView(CreateAPIView):
     def post(self, request):
         username = request.data.get('username')
         email = request.data.get('email')
-        if self.queryset.filter(username=username, email=email).exists():
+        user = self.queryset.filter(username=username, email=email).first()
+        if user:
+            send_confim_code(user)
             return Response(data=request.data, status=status.HTTP_200_OK)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            send_confim_code(serializer.instance)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         return Response(
             data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
