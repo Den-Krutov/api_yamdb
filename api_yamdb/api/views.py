@@ -1,9 +1,38 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from django.contrib.auth.models import Permission
 from django.db.models import Avg
+from rest_framework import viewsets, mixins, filters
+from rest_framework.decorators import permission_classes
+from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import ReviewSerializer, CommentSerializer
-from reviews.models import Title, Review
+from .serializers import TitleSerializer, GenreSerializer, CategoriesSerializer, ReviewSerializer, CommentSerializer
+from reviews.models import Title, Genre, Categories, Review
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('category', 'genre', 'year', 'name')
+
+
+class CategoriesViewSet(mixins.CreateModelMixin,
+                        mixins.ListModelMixin,
+                        mixins.DestroyModelMixin,
+                        viewsets.GenericViewSet):
+    queryset = Categories.objects.all()
+    serializer_class = CategoriesSerializer
+
+
+class GenreViewSet(mixins.CreateModelMixin,
+                   mixins.ListModelMixin,
+                   mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    pagination_class = None
+    search_fields = ('name',)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
