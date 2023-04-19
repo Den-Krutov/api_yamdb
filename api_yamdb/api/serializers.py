@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 
-from reviews.models import User, Title, Genre, Categories, Review, Title, Comment
+from reviews.models import (
+    User, Title, Genre, Categories, Review, Title, Comment)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -11,7 +12,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    categories = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    categories = serializers.SlugRelatedField(
+        slug_field='name', read_only=True)
     genre = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
@@ -20,7 +22,8 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    categories = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    categories = serializers.SlugRelatedField(
+        slug_field='name', read_only=True)
     title = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:

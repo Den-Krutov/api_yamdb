@@ -73,20 +73,19 @@ class Categories(models.Model):
 class Title(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
-    categories = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
-    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True)
+    categories = models.ForeignKey(
+        Categories, on_delete=models.SET_NULL, null=True, blank=True)
+    genre = models.ForeignKey(
+        Genre, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.CharField(max_length=256)
-
-    def __str__(self):
-        return self.name
-
-
-class Title(models.Model):
     rating = models.IntegerField(
         verbose_name='Рейтинг (средняя оценка)',
         null=True,
         default=None
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Review(models.Model):

@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import Permission
 from django.db.models import Avg
 from rest_framework import viewsets, mixins, filters, status
 from rest_framework.response import Response
-from rest_framework.decorators import permission_classes
 from rest_framework.generics import CreateAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import UserSerializer, TitleSerializer, GenreSerializer, CategoriesSerializer, ReviewSerializer, CommentSerializer
+from .serializers import (
+    UserSerializer, TitleSerializer, GenreSerializer, CategoriesSerializer,
+    ReviewSerializer, CommentSerializer)
 from reviews.models import User, Title, Genre, Categories, Review
 
 
@@ -83,4 +83,5 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
+    def get_queryset(self):
+        return Title.objects.annotate(rating=Avg('reviews__score'))
