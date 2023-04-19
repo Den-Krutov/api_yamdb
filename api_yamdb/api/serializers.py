@@ -1,7 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, validators
 
-from reviews.models import Title, Genre, Categories, Review, Title, Comment
+from reviews.models import User, Title, Genre, Categories, Review, Title, Comment
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'username']
 
 
 class TitleSerializer(serializers.ModelSerializer):
