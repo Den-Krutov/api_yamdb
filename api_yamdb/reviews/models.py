@@ -1,15 +1,16 @@
-from django.db import models
-from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth import base_user, validators
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+from .validators import no_me_username_validator
 
 ROLES = [
     ('user', 'пользователь'), ('moderator', 'модератор'),
     ('admin', 'администратор')]
 DEFAULT_USER_ROLE = ROLES[0][0]
-DEFAULT_ADMIN_ROLE = ROLES[2][0]
 
 
-class UserManager(BaseUserManager):
+class UserManager(base_user.BaseUserManager):
     def create_user(self, username, email):
         if not email:
             raise ValueError('Введите email')
@@ -20,12 +21,20 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self, username, email, **extra_fields):
-        extra_fields.setdefault('role', DEFAULT_ADMIN_ROLE)
-        return super().create_superuser(self, username, email, **extra_fields)
-
 
 class User(AbstractUser):
+    username_validator = validators.UnicodeUsernameValidator()
+
+    username = models.CharField(
+        'username',
+        max_length=150,
+        unique=True,
+        help_text='Введите уникальный username пользователя',
+        validators=[username_validator, no_me_username_validator],
+        error_messages={
+            'unique': "Пользователь с таким именем уже существует",
+        },
+    )
     email = models.EmailField(
         'email адрес', max_length=254, unique=True,
         help_text='Введите email адрес')
