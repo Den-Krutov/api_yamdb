@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 from rest_framework import viewsets, mixins, filters, status
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import GenericAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import (
@@ -12,7 +12,7 @@ from reviews.models import User, Title, Genre, Categories, Review
 from .utils import send_confim_code
 
 
-class SignUpView(CreateAPIView):
+class SignUpView(GenericAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
