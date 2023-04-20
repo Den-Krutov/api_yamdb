@@ -6,10 +6,10 @@ from rest_framework.generics import GenericAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import (
-    UserSerializer, TitleSerializer, GenreSerializer, CategoriesSerializer,
-    ReviewSerializer, CommentSerializer)
+    UserSerializer, TokenSerializer, TitleSerializer, GenreSerializer,
+    CategoriesSerializer, ReviewSerializer, CommentSerializer)
 from reviews.models import User, Title, Genre, Categories, Review
-from .utils import send_confim_code
+from .utils import send_confirm_code
 
 
 class SignUpView(GenericAPIView):
@@ -21,13 +21,25 @@ class SignUpView(GenericAPIView):
         email = request.data.get('email')
         user = self.queryset.filter(username=username, email=email).first()
         if user:
-            send_confim_code(user)
+            send_confirm_code(user)
             return Response(data=request.data, status=status.HTTP_200_OK)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            send_confim_code(serializer.instance)
+            send_confirm_code(serializer.instance)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TokenView(GenericAPIView):
+    serializer_class = TokenSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            return Response(
+                data=serializer.validated_data, status=status.HTTP_200_OK)
         return Response(
             data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

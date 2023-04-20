@@ -1,5 +1,9 @@
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.tokens import default_token_generator as dtg
 from rest_framework import serializers, validators
+from rest_framework_simplejwt.serializers import TokenObtainSerializer
+from rest_framework_simplejwt.tokens import AccessToken
+
 
 from reviews.models import (
     User, Title, Genre, Categories, Review, Title, Comment)
@@ -9,6 +13,21 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username']
+
+
+class TokenSerializer(TokenObtainSerializer):
+    token_class = AccessToken
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop('password')
+        self.fields['confirmation_code'] = serializers.CharField()
+
+    def validate(self, attrs):
+        self.user = get_object_or_404(User, username=attrs['username'])
+        if not dtg.check_token(self.user, attrs['confirmation_code']):
+            raise serializers.ValidationError('Неверный confirmation_code')
+        return {'token': str(self.get_token(self.user))}
 
 
 class TitleSerializer(serializers.ModelSerializer):
