@@ -1,33 +1,51 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
-from rest_framework import viewsets, mixins, filters, status
+from rest_framework import viewsets, mixins, filters, status, permissions
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import (
-    UserSerializer, TitleSerializer, GenreSerializer, CategoriesSerializer,
-    ReviewSerializer, CommentSerializer)
+    UserSerializer, TokenSerializer, TitleSerializer, GenreSerializer,
+    CategoriesSerializer, ReviewSerializer, CommentSerializer)
 from reviews.models import User, Title, Genre, Categories, Review
-from .utils import send_confim_code
+from .utils import send_confirm_code
 
 
 class SignUpView(GenericAPIView):
+    """Класс регистрации новых пользователей"""
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         username = request.data.get('username')
         email = request.data.get('email')
         user = self.queryset.filter(username=username, email=email).first()
         if user:
-            send_confim_code(user)
+            send_confirm_code(user)
             return Response(data=request.data, status=status.HTTP_200_OK)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            send_confim_code(serializer.instance)
+            send_confirm_code(serializer.instance)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TokenView(GenericAPIView):
+    """Получение токена с помощью username пользователя и confirmation_code"""
+
+    serializer_class = TokenSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            return Response(
+                data=serializer.validated_data, status=status.HTTP_200_OK)
         return Response(
             data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
