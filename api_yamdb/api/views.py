@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
-from rest_framework import viewsets, mixins, filters, status
+from rest_framework import viewsets, mixins, filters, status, permissions
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -13,8 +13,11 @@ from .utils import send_confirm_code
 
 
 class SignUpView(GenericAPIView):
+    """Класс регистрации новых пользователей"""
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         username = request.data.get('username')
@@ -33,7 +36,10 @@ class SignUpView(GenericAPIView):
 
 
 class TokenView(GenericAPIView):
+    """Получение токена с помощью username пользователя и confirmation_code"""
+
     serializer_class = TokenSerializer
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

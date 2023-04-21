@@ -24,10 +24,16 @@ class TokenSerializer(TokenObtainSerializer):
         self.fields['confirmation_code'] = serializers.CharField()
 
     def validate(self, attrs):
-        self.user = get_object_or_404(User, username=attrs['username'])
-        if not dtg.check_token(self.user, attrs['confirmation_code']):
-            raise serializers.ValidationError('Неверный confirmation_code')
         return {'token': str(self.get_token(self.user))}
+
+    def validate_username(self, username):
+        self.user = get_object_or_404(User, username=username)
+        return username
+
+    def validate_confirmation_code(self, confirmation_code):
+        if not dtg.check_token(self.user, confirmation_code):
+            raise serializers.ValidationError('Неверный confirmation_code')
+        return confirmation_code
 
 
 class TitleSerializer(serializers.ModelSerializer):
