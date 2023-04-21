@@ -53,6 +53,12 @@ class User(AbstractUser):
             ),
         ]
 
+    def is_admin(self):
+        return self.role == ROLES[2][0] or self.is_staff
+
+    def is_moderator(self):
+        return self.role == ROLES[1][0]
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=256)
