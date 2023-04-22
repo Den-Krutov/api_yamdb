@@ -59,7 +59,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_fields = ('category', 'genre', 'year', 'name')
 
     def get_queryset(self):
-        return Title.objects.annotate(rating=Avg('reviews__score'))
+        return Title.objects.annotate(Avg('reviews__score'))
 
 
 class CategoriesViewSet(mixins.CreateModelMixin,
