@@ -57,15 +57,16 @@ class TokenView(GenericAPIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = AdminUserSerializer
-    permission_classes = [Admin]
+    permission_classes = (Admin,)
     filter_backends = (filters.SearchFilter,)
     lookup_field = 'username'
     search_fields = ('username',)
     pagination_class = PageNumberPagination
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @decorators.action(
         detail=False, methods=['get', 'patch'], url_name='me',
-        permission_classes=(permissions.IsAuthenticated)
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def me(self, request):
         serializer = self.serializer_class(request.user)

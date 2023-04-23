@@ -4,7 +4,6 @@ from rest_framework import serializers, validators
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
 
-
 from reviews.models import (
     User, Title, Genre, Categories, Review, Title, Comment)
 
@@ -22,6 +21,7 @@ class TokenSerializer(TokenObtainSerializer):
         super().__init__(*args, **kwargs)
         self.fields.pop('password')
         self.fields['confirmation_code'] = serializers.CharField()
+        self.user = None
 
     def validate(self, attrs):
         return {'token': str(self.get_token(self.user))}
