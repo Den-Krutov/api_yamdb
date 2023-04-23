@@ -1,15 +1,18 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import (
+    filters, mixins, permissions, status, viewsets, decorators)
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
 from reviews.models import Categories, Genre, Review, Title, User
 from .permissions import Admin, AdminOrReadOnly, Moderator
 from .serializers import (CategoriesSerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, TitleSerializer,
-                          TokenSerializer, UserSerializer)
+                          TokenSerializer, SignUpSerializer, UserSerializer,
+                          AdminUserSerializer)
 from .utils import send_confirm_code
 
 
@@ -17,7 +20,7 @@ class SignUpView(GenericAPIView):
     """Класс регистрации новых пользователей"""
 
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = SignUpSerializer
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
@@ -49,6 +52,34 @@ class TokenView(GenericAPIView):
                 data=serializer.validated_data, status=status.HTTP_200_OK)
         return Response(
             data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = AdminUserSerializer
+    permission_classes = (Admin,)
+    filter_backends = (filters.SearchFilter,)
+    lookup_field = 'username'
+    search_fields = ('username',)
+    pagination_class = PageNumberPagination
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+    @decorators.action(
+        detail=False, methods=['get', 'patch'], url_name='me',
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def me(self, request):
+        serializer = self.serializer_class(request.user)
+        if request.method == 'PATCH':
+            if request.user.is_admin():
+                serializer = self.serializer_class(
+                    request.user, data=request.data, partial=True)
+            else:
+                serializer = UserSerializer(
+                    request.user, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TitleViewSet(viewsets.ModelViewSet):

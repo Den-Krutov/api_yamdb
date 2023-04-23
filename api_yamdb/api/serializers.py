@@ -4,12 +4,11 @@ from rest_framework import serializers, validators
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
 
-
 from reviews.models import (
     User, Title, Genre, Categories, Review, Title, Comment)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username']
@@ -22,6 +21,7 @@ class TokenSerializer(TokenObtainSerializer):
         super().__init__(*args, **kwargs)
         self.fields.pop('password')
         self.fields['confirmation_code'] = serializers.CharField()
+        self.user = None
 
     def validate(self, attrs):
         return {'token': str(self.get_token(self.user))}
@@ -31,9 +31,22 @@ class TokenSerializer(TokenObtainSerializer):
         return username
 
     def validate_confirmation_code(self, confirmation_code):
-        if not dtg.check_token(self.user, confirmation_code):
+        if not self.user or not dtg.check_token(self.user, confirmation_code):
             raise serializers.ValidationError('Неверный confirmation_code')
         return confirmation_code
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'bio']
+
+
+class AdminUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role']
 
 
 class TitleSerializer(serializers.ModelSerializer):
