@@ -24,19 +24,13 @@ class SignUpView(GenericAPIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        username = request.data.get('username')
-        email = request.data.get('email')
-        user = self.queryset.filter(username=username, email=email).first()
-        if user:
-            send_confirm_code(user)
-            return Response(data=request.data, status=status.HTTP_200_OK)
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            send_confirm_code(serializer.instance)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        user, _ = User.objects.get_or_create(
+            **serializer.validated_data
+        )
+        send_confirm_code(user)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class TokenView(GenericAPIView):
@@ -55,7 +49,6 @@ class TokenView(GenericAPIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
     serializer_class = AdminUserSerializer
     permission_classes = (Admin,)
     filter_backends = (filters.SearchFilter,)
@@ -63,6 +56,9 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     pagination_class = PageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
+
+    def get_queryset(self):
+        return User.objects.order_by('username')
 
     @decorators.action(
         detail=False, methods=['get', 'patch'], url_name='me',
