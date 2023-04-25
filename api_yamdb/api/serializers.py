@@ -8,10 +8,27 @@ from reviews.models import (
     User, Title, Genre, Categories, Review, Title, Comment)
 
 
-class SignUpSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['email', 'username']
+class SignUpSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=254)
+    username = serializers.SlugField(max_length=150)
+
+    def validate_username(self, username):
+        if username == 'me':
+            raise serializers.ValidationError('username не может быть me')
+        return username
+
+    def validate(self, data):
+        username = data.get('username')
+        email = data.get('email')
+        user = User.objects.filter(username=username).first()
+        if user and user.email != email:
+            raise serializers.ValidationError(
+                'Пользователь с таким username уже существует')
+        user = User.objects.filter(email=email).first()
+        if user and user.username != username:
+            raise serializers.ValidationError(
+                'Пользователь с таким email уже существует')
+        return data
 
 
 class TokenSerializer(TokenObtainSerializer):
@@ -23,7 +40,7 @@ class TokenSerializer(TokenObtainSerializer):
         self.fields['confirmation_code'] = serializers.CharField()
         self.user = None
 
-    def validate(self, attrs):
+    def validate(self, data):
         return {'token': str(self.get_token(self.user))}
 
     def validate_username(self, username):
