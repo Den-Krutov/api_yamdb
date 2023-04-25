@@ -6,9 +6,9 @@ from rest_framework.generics import CreateAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import (
-    UserSerializer, TitleSerializer, GenreSerializer, CategoriesSerializer,
+    UserSerializer, TitleSerializer, GenreSerializer, CategorySerializer,
     ReviewSerializer, CommentSerializer)
-from reviews.models import User, Title, Genre, Categories, Review
+from reviews.models import User, Title, Genre, Category, Review
 from .utils import send_confim_code
 
 
@@ -39,12 +39,12 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_fields = ('category', 'genre', 'year', 'name')
 
 
-class CategoriesViewSet(mixins.CreateModelMixin,
+class CategoryViewSet(mixins.CreateModelMixin,
                         mixins.ListModelMixin,
                         mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
-    queryset = Categories.objects.all()
-    serializer_class = CategoriesSerializer
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
 class GenreViewSet(mixins.CreateModelMixin,
