@@ -2,7 +2,7 @@ from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 
 
-def send_confim_code(user):
+def send_confirm_code(user):
     code = default_token_generator.make_token(user)
     send_mail(
         'Confim code',
