@@ -7,13 +7,12 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
-from reviews.models import Categories, Genre, Review, Title, User
 from .permissions import Admin, AdminOrReadOnly, Moderator
 from .serializers import (
     UserSerializer, TitleSerializer, GenreSerializer, CategorySerializer,
-    ReviewSerializer, CommentSerializer)
+    ReviewSerializer, CommentSerializer, SignUpSerializer, TokenSerializer, AdminUserSerializer)
 from reviews.models import User, Title, Genre, Category, Review
-from .utils import send_confim_code
+from .utils import send_confirm_code
 
 
 class SignUpView(GenericAPIView):
@@ -90,9 +89,9 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
-                        mixins.ListModelMixin,
-                        mixins.DestroyModelMixin,
-                        viewsets.GenericViewSet):
+                      mixins.ListModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
   
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
