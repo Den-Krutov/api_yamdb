@@ -1,3 +1,4 @@
+import django_filters
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator as dtg
 from rest_framework import serializers, validators
@@ -84,14 +85,15 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ['name', 'slug']
+        fields = ['id', 'name', 'categories', 'title']
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
 
     class Meta:
         model = Category
-        fields = ['name', 'slug']
+        fields = ['name']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
