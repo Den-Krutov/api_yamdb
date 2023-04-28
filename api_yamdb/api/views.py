@@ -96,6 +96,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AdminOrReadOnly]
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ['name']
 
 

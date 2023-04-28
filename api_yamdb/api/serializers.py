@@ -75,7 +75,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ['category', 'genre', 'name', 'year', 'description']
+        fields = ('name', 'year', 'rating', 'description', 'genre', 'category')
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -85,14 +85,15 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ['name', 'slug']
+        fields = ('name', 'slug')
 
 
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['name', 'slug']
+        exclude = ('id',)
+        lookup_field = 'slug'
 
 
 class ReviewSerializer(serializers.ModelSerializer):
