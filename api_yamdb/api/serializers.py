@@ -75,7 +75,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ['category', 'genre', 'name', 'year']
+        fields = ['category', 'genre', 'name', 'year', 'description']
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -85,15 +85,14 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ['id', 'name', 'categories', 'title']
+        fields = ['name', 'slug']
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
 
     class Meta:
         model = Category
-        fields = ['name']
+        fields = ['name', 'slug']
 
 
 class ReviewSerializer(serializers.ModelSerializer):

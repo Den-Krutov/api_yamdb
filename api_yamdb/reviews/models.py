@@ -73,7 +73,7 @@ class Genre(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50)
+    slug = models.SlugField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
@@ -82,11 +82,10 @@ class Category(models.Model):
 class Title(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
-    category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     genre = models.ManyToManyField(
         Genre)
-    description = models.CharField(max_length=256)
+    description = models.CharField(max_length=256, required=False)
     rating = models.IntegerField(
         verbose_name='Рейтинг (средняя оценка)',
         null=True,

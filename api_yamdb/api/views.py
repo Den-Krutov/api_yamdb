@@ -96,6 +96,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AdminOrReadOnly]
+    search_fields = ['name']
 
 
 class GenreViewSet(mixins.CreateModelMixin,
