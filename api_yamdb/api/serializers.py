@@ -68,7 +68,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    categories = serializers.SlugRelatedField(
+    category = serializers.SlugRelatedField(
         slug_field='name', read_only=True)
     genre = serializers.SlugRelatedField(slug_field='name', read_only=True)
     rating = serializers.IntegerField(read_only=True)
