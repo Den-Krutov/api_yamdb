@@ -65,15 +65,15 @@ class User(AbstractUser):
 
 class Genre(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50)
+    slug = models.SlugField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
 
 
-class Categories(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50)
+    slug = models.SlugField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
@@ -82,11 +82,9 @@ class Categories(models.Model):
 class Title(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
-    categories = models.ForeignKey(
-        Categories, on_delete=models.SET_NULL, null=True, blank=True)
-    genre = models.ForeignKey(
-        Genre, on_delete=models.SET_NULL, null=True, blank=True)
-    description = models.CharField(max_length=256)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    genre = models.ManyToManyField(Genre)
+    description = models.TextField(max_length=256, blank=True, null=True)
     rating = models.IntegerField(
         verbose_name='Рейтинг (средняя оценка)',
         null=True,

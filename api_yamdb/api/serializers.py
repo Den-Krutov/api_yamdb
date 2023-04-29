@@ -1,3 +1,4 @@
+import django_filters
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator as dtg
 from rest_framework import serializers, validators
@@ -5,7 +6,7 @@ from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import (
-    User, Title, Genre, Categories, Review, Title, Comment)
+    User, Genre, Category, Review, Title, Comment)
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -67,33 +68,29 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    categories = serializers.SlugRelatedField(
+    category = serializers.SlugRelatedField(
         slug_field='name', read_only=True)
     genre = serializers.SlugRelatedField(slug_field='name', read_only=True)
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('name', 'year', 'rating', 'description', 'genre', 'category')
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    categories = serializers.SlugRelatedField(
-        slug_field='name', read_only=True)
-    title = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
         model = Genre
-        fields = '__all__'
+        fields = ('name', 'slug')
 
 
-class CategoriesSerializer(serializers.ModelSerializer):
-    title = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    genre = serializers.SlugRelatedField(slug_field='name', read_only=True)
+class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Categories
-        fields = '__all__'
+        model = Category
+        exclude = ('id',)
+        lookup_field = 'slug'
 
 
 class ReviewSerializer(serializers.ModelSerializer):
