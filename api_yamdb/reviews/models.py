@@ -84,7 +84,7 @@ class Title(models.Model):
     year = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     genre = models.ManyToManyField(Genre)
-    description = models.CharField(max_length=256, required=False)
+    description = models.TextField(max_length=256, blank=True, null=False)
     rating = models.IntegerField(
         verbose_name='Рейтинг (средняя оценка)',
         null=True,
