@@ -67,30 +67,48 @@ class AdminUserSerializer(serializers.ModelSerializer):
             'username', 'email', 'first_name', 'last_name', 'bio', 'role']
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(
-        slug_field='name', read_only=True)
-    genre = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    rating = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = Title
-        fields = ('name', 'year', 'rating', 'description', 'genre', 'category')
-
-
 class GenreSerializer(serializers.ModelSerializer):
-
     class Meta:
+        exclude = ('id',)
         model = Genre
-        fields = ('name', 'slug')
+        lookup_field = 'slug'
 
 
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
+        exclude = ('id', )
         model = Category
-        exclude = ('id',)
         lookup_field = 'slug'
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(
+        read_only=True,
+        many=True
+    )
+    rating = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Title
+        fields = ('name', 'year', 'rating', 'description', 'genre', 'category', 'id')
+
+
+class TitleWriteSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True
+    )
+
+    class Meta:
+        model = Title
+        fields = ('name', 'year', 'rating', 'description', 'genre', 'category', 'id')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
