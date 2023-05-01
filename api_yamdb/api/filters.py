@@ -1,17 +1,26 @@
-from rest_framework import generics
-from api_yamdb.reviews.models import Title
-from api_yamdb.api.serializers import TitleSerializer
+from django_filters import rest_framework as filters
+
+from reviews.models import Title
 
 
-class TitleList(generics.ListAPIView):
-    serializer_class = TitleSerializer
+class TitleFilter(filters.FilterSet):
+    category = filters.CharFilter(
+        field_name='category__slug',
+        lookup_expr='icontains'
+    )
+    genre = filters.CharFilter(
+        field_name='genre__slug',
+        lookup_expr='icontains'
+    )
+    name = filters.CharFilter(
+        field_name='name',
+        lookup_expr='icontains'
+    )
+    year = filters.NumberFilter(
+        field_name='year',
+        lookup_expr='icontains'
+    )
 
-    def get_queryset(self):
-        queryset = Title.objects.all()
-        category_slug = self.request.query_params.get('category', None)
-        if category_slug is not None:
-            queryset = queryset.filter(category__slug=category_slug)
-        genre_slug = self.request.query_params.get('genre', None)
-        if genre_slug is not None:
-            queryset = queryset.filter(genre__slug=genre_slug)
-        return queryset
+    class Meta:
+        model = Title
+        fields = '__all__'

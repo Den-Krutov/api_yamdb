@@ -7,10 +7,11 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
+from .filters import TitleFilter
 from .permissions import Admin, AdminOrReadOnly, Moderator
 from .serializers import (
     UserSerializer, TitleSerializer, GenreSerializer, CategorySerializer,
-    ReviewSerializer, CommentSerializer, SignUpSerializer, TokenSerializer, AdminUserSerializer)
+    ReviewSerializer, CommentSerializer, SignUpSerializer, TokenSerializer, AdminUserSerializer, TitleWriteSerializer)
 from reviews.models import User, Title, Genre, Category, Review
 from .utils import send_confirm_code
 
@@ -78,11 +79,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
     permission_classes = [AdminOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category', 'genre', 'year', 'name')
+    pagination_class = PageNumberPagination
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitleSerializer
+        return TitleWriteSerializer
 
     def get_queryset(self):
         return Title.objects.annotate(Avg('reviews__score'))
@@ -97,7 +102,9 @@ class CategoryViewSet(mixins.CreateModelMixin,
     serializer_class = CategorySerializer
     permission_classes = [AdminOrReadOnly]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    pagination_class = PageNumberPagination
     search_fields = ['name']
+    lookup_field = 'slug'
 
 
 class GenreViewSet(mixins.CreateModelMixin,
@@ -108,8 +115,9 @@ class GenreViewSet(mixins.CreateModelMixin,
     serializer_class = GenreSerializer
     permission_classes = [AdminOrReadOnly]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    pagination_class = None
-    search_fields = ('name',)
+    pagination_class = PageNumberPagination
+    search_fields = ['name',]
+    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
