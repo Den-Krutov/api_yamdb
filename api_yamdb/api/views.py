@@ -5,7 +5,7 @@ from rest_framework import (
     filters, mixins, permissions, status, viewsets, decorators)
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.pagination import PageNumberPagination
 
 from .filters import TitleFilter
 from .permissions import Admin, AdminOrReadOnly, Moderator

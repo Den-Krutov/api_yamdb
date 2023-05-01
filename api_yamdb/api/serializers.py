@@ -77,7 +77,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
-        exclude = ('id', )
+        exclude = ('id',)
         model = Category
         lookup_field = 'slug'
 
