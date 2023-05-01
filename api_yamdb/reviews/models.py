@@ -104,8 +104,7 @@ class Review(models.Model):
         related_name='reviews'
     )
     text = models.TextField(
-        verbose_name='Текст отзыва',
-        max_length=1000
+        verbose_name='Текст отзыва'
     )
     author = models.ForeignKey(
         User,
