@@ -79,8 +79,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
     permission_classes = [AdminOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
     pagination_class = PageNumberPagination
@@ -104,7 +102,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     serializer_class = CategorySerializer
     permission_classes = [AdminOrReadOnly]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    pagination_class = LimitOffsetPagination
+    pagination_class = PageNumberPagination
     search_fields = ['name']
     lookup_field = 'slug'
 
@@ -117,8 +115,8 @@ class GenreViewSet(mixins.CreateModelMixin,
     serializer_class = GenreSerializer
     permission_classes = [AdminOrReadOnly]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    pagination_class = LimitOffsetPagination
-    search_fields = ('name',)
+    pagination_class = PageNumberPagination
+    search_fields = ['name',]
     lookup_field = 'slug'
 
 
