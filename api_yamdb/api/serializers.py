@@ -1,7 +1,6 @@
-import django_filters
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator as dtg
-from rest_framework import serializers, validators
+from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -88,11 +87,15 @@ class TitleSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True
     )
-    rating = serializers.IntegerField(read_only=True)
+    rating = serializers.IntegerField(
+        source='reviews__score__avg',
+        read_only=True
+    )
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'rating', 'description', 'genre', 'category', 'id')
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre',
+                  'category')
 
 
 class TitleWriteSerializer(serializers.ModelSerializer):
@@ -108,7 +111,8 @@ class TitleWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'rating', 'description', 'genre', 'category', 'id')
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre',
+                  'category')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -127,16 +131,12 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
 
-    validators = [
-        validators.UniqueTogetherValidator(
-            queryset=Review.objects.all(),
-            fields=['title', 'author'],
-        )
-    ]
-
     def validate(self, data):
         """Проверяем, что пользователь не может оставить второй отзыв."""
-        title = get_object_or_404(Title, id=self.kwargs['title_id'])
+        title = get_object_or_404(
+            Title,
+            id=self.context['view'].kwargs.get('title_id')
+        )
         author = self.context['request'].user
         if (
             self.context['request'].method == 'POST'
@@ -167,3 +167,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        fields = '__all__'

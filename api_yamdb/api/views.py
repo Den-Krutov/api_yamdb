@@ -11,7 +11,8 @@ from .filters import TitleFilter
 from .permissions import Admin, AdminOrReadOnly, Moderator
 from .serializers import (
     UserSerializer, TitleSerializer, GenreSerializer, CategorySerializer,
-    ReviewSerializer, CommentSerializer, SignUpSerializer, TokenSerializer, AdminUserSerializer, TitleWriteSerializer)
+    ReviewSerializer, CommentSerializer, SignUpSerializer, TokenSerializer,
+    AdminUserSerializer, TitleWriteSerializer)
 from reviews.models import User, Title, Genre, Category, Review
 from .utils import send_confirm_code
 
@@ -97,7 +98,6 @@ class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
-  
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AdminOrReadOnly]
@@ -116,7 +116,7 @@ class GenreViewSet(mixins.CreateModelMixin,
     permission_classes = [AdminOrReadOnly]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     pagination_class = PageNumberPagination
-    search_fields = ['name',]
+    search_fields = ['name']
     lookup_field = 'slug'
 
 
@@ -124,6 +124,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """ViewSet для модели Review."""
     serializer_class = ReviewSerializer
     permission_classes = [Moderator]
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
@@ -138,6 +139,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     """ViewSet для модели Comment."""
     serializer_class = CommentSerializer
     permission_classes = [Moderator]
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
