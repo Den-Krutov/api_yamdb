@@ -95,6 +95,21 @@ class Title(models.Model):
         return self.name
 
 
+class GenreTitle(models.Model):
+    """Вспомогательная модель жанров произведения."""
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name="Произведение")
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+        verbose_name="Жанр")
+
+    class Meta:
+        verbose_name = "Жанр произведения"
+
+
 class Review(models.Model):
     """Модель отзыва на произведение."""
     title = models.ForeignKey(
