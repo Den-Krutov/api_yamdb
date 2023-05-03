@@ -91,7 +91,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleWriteSerializer
 
     def get_queryset(self):
-        return Title.objects.annotate(Avg('reviews__score'))
+        return Title.objects.annotate(Avg('reviews__score')).order_by('name')
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
