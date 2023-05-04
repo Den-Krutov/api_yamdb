@@ -70,6 +70,9 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+
 
 class Category(models.Model):
     name = models.CharField(max_length=256)
@@ -78,12 +81,15 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+
 
 class Title(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
-    genre = models.ManyToManyField(Genre)
+    genre = models.ManyToManyField(Genre, through='GenreTitle')
     description = models.TextField(max_length=256, null=True)
     rating = models.IntegerField(
         verbose_name='Рейтинг (средняя оценка)',
@@ -93,6 +99,24 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
+class GenreTitle(models.Model):
+    """Вспомогательная модель жанров произведения."""
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name="Произведение")
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+        verbose_name="Жанр")
+
+    class Meta:
+        verbose_name = "Жанр произведения"
 
 
 class Review(models.Model):
