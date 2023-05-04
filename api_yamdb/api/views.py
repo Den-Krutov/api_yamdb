@@ -1,19 +1,19 @@
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (
-    filters, mixins, permissions, status, viewsets, decorators)
+from rest_framework import (decorators, filters, mixins, permissions, status,
+                            viewsets)
 from rest_framework.generics import GenericAPIView
-from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
+from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
 from .permissions import Admin, AdminOrReadOnly, Moderator
 from .serializers import (
-    UserSerializer, TitleSerializer, GenreSerializer, CategorySerializer,
-    ReviewSerializer, CommentSerializer, SignUpSerializer, TokenSerializer,
-    AdminUserSerializer, TitleWriteSerializer)
-from reviews.models import User, Title, Genre, Category, Review
+    AdminUserSerializer, CategorySerializer, CommentSerializer,
+    GenreSerializer, ReviewSerializer, SignUpSerializer, TitleSerializer,
+    TitleWriteSerializer, TokenSerializer, UserSerializer)
 from .utils import send_confirm_code
 
 

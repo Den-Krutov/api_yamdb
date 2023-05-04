@@ -1,7 +1,7 @@
 from django.contrib.auth import base_user, validators
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 from .validators import no_me_username_validator
 
