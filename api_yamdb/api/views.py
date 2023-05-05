@@ -80,6 +80,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.annotate(Avg('reviews__score')).order_by('name')
     permission_classes = [AdminOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
     pagination_class = PageNumberPagination
@@ -89,9 +90,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve'):
             return TitleSerializer
         return TitleWriteSerializer
-
-    def get_queryset(self):
-        return Title.objects.annotate(Avg('reviews__score')).order_by('name')
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
