@@ -2,11 +2,12 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
-    filters, mixins, permissions, status, viewsets, decorators)
+    filters, permissions, status, viewsets, decorators)
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
+from .mixins import CreateListDestroyViewSet
 from .filters import TitleFilter
 from .permissions import Admin, AdminOrReadOnly, Moderator
 from .serializers import (
@@ -94,10 +95,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return Title.objects.annotate(Avg('reviews__score')).order_by('name')
 
 
-class CategoryViewSet(mixins.CreateModelMixin,
-                      mixins.ListModelMixin,
-                      mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
+class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AdminOrReadOnly]
@@ -107,10 +105,7 @@ class CategoryViewSet(mixins.CreateModelMixin,
     lookup_field = 'slug'
 
 
-class GenreViewSet(mixins.CreateModelMixin,
-                   mixins.ListModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+class GenreViewSet(CreateListDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [AdminOrReadOnly]

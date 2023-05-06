@@ -1,59 +1,49 @@
 import csv
-import os
 
-from django.core.management import BaseCommand
+from reviews.models import Category, Genre, Title, Review, Comment, User
 
-from reviews.models import (Category, Comment, Genre, GenreTitle,
-                            Review, Title, User)
+from api_yamdb import settings
+from django.core.management.base import BaseCommand
 
-FILES_DIR = "static/data"
-
-CLASSES = {
-    "users.csv": User,
-    "category.csv": Category,
-    "titles.csv": Title,
-    "review.csv": Review,
-    "comments.csv": Comment,
-    "genre.csv": Genre,
-    "genre_title.csv": GenreTitle
+CSV_FILES = {
+    'category': Category,
+    'genre': Genre,
+    'titles': Title,
+    'users': User,
+    'genre_title': Title.genre.through,
+    'review': Review,
+    'comments': Comment
 }
 
-FOREIGN_FIELDS = {
-    "category": ("category", Category),
-    "title_id": ("title", Title),
-    "genre_id": ("genre", Genre),
-    "author": ("author", User),
-    "review_id": ("review", Review),
-}
-
-
-def open_file(file):
-    file_path = os.path.join(FILES_DIR, file)
-    with open(file_path, encoding="utf-8") as csv_file:
-        return list(csv.reader(csv_file))
-
-
-def load_file(file, model_type):
-    data = open_file(file)
-    rows = data[1:]
-    for row in rows:
-        csv_data = dict(zip(data[0], row))
-        new_data_csv = dict(csv_data)
-        for key, value in csv_data.items():
-            if key in FOREIGN_FIELDS.keys():
-                new_key = FOREIGN_FIELDS[key][0]
-                new_data_csv[new_key] = (
-                    FOREIGN_FIELDS[key][1].objects.get(pk=value)
-                )
-        database = model_type(**new_data_csv)
-        database.save()
+CONTENT_DIR = settings.BASE_DIR / 'static/data'
 
 
 class Command(BaseCommand):
-    """Загрузка данных, для тестирования."""
+    """
+    Импортирует данные для конкретных моделей из .csv файлов.
+    """
 
-    help = "Загрузка данных"
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--delete-existing',
+            action='store_true',
+            dest='delete_existing',
+            default=False,
+            help='Удаляет существующие данные конкретной Модели',
+        )
 
     def handle(self, *args, **options):
-        for key, value in CLASSES.items():
-            load_file(key, value)
+        for file, model in CSV_FILES.items():
+            with open(CONTENT_DIR / f'{file}.csv', newline='') as f:
+                reader = csv.DictReader(f)
+                if options["delete_existing"]:
+                    model.objects.all().delete()
+                self.stdout.write(self.style.SUCCESS(
+                    f'Удалены старые записи {file.capitalize()}.'))
+                for row in reader:
+                    model.objects.create(**row)
+                self.stdout.write(self.style.SUCCESS(
+                    f'Записи {file.capitalize()} созданы.'))
+
+        self.stdout.write(self.style.SUCCESS(
+            'Поздравляем! Ваша БД наполнена!. '))
