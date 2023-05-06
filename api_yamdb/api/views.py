@@ -17,7 +17,6 @@ from .serializers import (
 from reviews.models import User, Title, Genre, Category, Review
 from .utils import send_confirm_code
 
-
 class SignUpView(GenericAPIView):
     """Класс регистрации новых пользователей"""
 
