@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from .validators import no_me_username_validator
+from .validators import no_me_username_validator, validate_year
 
 ROLES = [
     ('user', 'пользователь'), ('moderator', 'модератор'),
@@ -46,6 +46,8 @@ class User(AbstractUser):
         help_text='Выберите роль пользователя')
 
     class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
         constraints = [
             models.CheckConstraint(
                 check=~models.Q(username='me'),
@@ -71,6 +73,8 @@ class Genre(models.Model):
         return self.name
 
     class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
         ordering = ['name']
 
 
@@ -82,14 +86,20 @@ class Category(models.Model):
         return self.name
 
     class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
         ordering = ['name']
 
 
 class Title(models.Model):
     name = models.CharField(max_length=256)
-    year = models.IntegerField()
+    year = models.IntegerField(validators=(validate_year, ))
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
-    genre = models.ManyToManyField(Genre, through='GenreTitle')
+    genre = models.ManyToManyField(
+        Genre,
+        related_name="titles",
+        verbose_name="Жанр",
+    )
     description = models.TextField(max_length=256, null=True)
     rating = models.IntegerField(
         verbose_name='Рейтинг (средняя оценка)',
@@ -101,22 +111,9 @@ class Title(models.Model):
         return self.name
 
     class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
         ordering = ['name']
-
-
-class GenreTitle(models.Model):
-    """Вспомогательная модель жанров произведения."""
-    title = models.ForeignKey(
-        Title,
-        on_delete=models.CASCADE,
-        verbose_name="Произведение")
-    genre = models.ForeignKey(
-        Genre,
-        on_delete=models.CASCADE,
-        verbose_name="Жанр")
-
-    class Meta:
-        verbose_name = "Жанр произведения"
 
 
 class Review(models.Model):
@@ -149,6 +146,8 @@ class Review(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
         ordering = ['pub_date']
         constraints = [
             models.UniqueConstraint(
@@ -185,6 +184,8 @@ class Comment(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
         ordering = ['pub_date']
 
     def __str__(self) -> str:
