@@ -1,9 +1,9 @@
 import csv
 
-from reviews.models import Category, Genre, Title, Review, Comment, User
-
-from api_yamdb import settings
+from django.conf import settings
 from django.core.management.base import BaseCommand
+
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 CSV_FILES = {
     'category': Category,
