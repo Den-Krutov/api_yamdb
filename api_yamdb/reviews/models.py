@@ -3,12 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from .validators import no_me_username_validator
-
-ROLES = [
-    ('user', 'пользователь'), ('moderator', 'модератор'),
-    ('admin', 'администратор')]
-DEFAULT_USER_ROLE = ROLES[0][0]
+from .validators import no_me_username_validator, validate_year
 
 
 class UserManager(base_user.BaseUserManager):
@@ -24,8 +19,15 @@ class UserManager(base_user.BaseUserManager):
 
 
 class User(AbstractUser):
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+    ROLES = [
+        (USER, 'пользователь'),
+        (MODERATOR, 'модератор'),
+        (ADMIN, 'администратор'),
+    ]
     username_validator = validators.UnicodeUsernameValidator()
-
     username = models.CharField(
         'username',
         max_length=150,
@@ -42,10 +44,12 @@ class User(AbstractUser):
     bio = models.TextField(
         'Биография', blank=True, help_text='Введите биографию пользователя')
     role = models.CharField(
-        'Роль', max_length=64, choices=ROLES, default=DEFAULT_USER_ROLE,
+        'Роль', max_length=64, choices=ROLES, default=USER,
         help_text='Выберите роль пользователя')
 
     class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
         constraints = [
             models.CheckConstraint(
                 check=~models.Q(username='me'),
@@ -57,10 +61,10 @@ class User(AbstractUser):
         return self.username
 
     def is_admin(self):
-        return self.role == ROLES[2][0] or self.is_staff
+        return self.role == self.ADMIN or self.is_staff
 
     def is_moderator(self):
-        return self.role == ROLES[1][0]
+        return self.role == self.MODERATOR
 
 
 class Genre(models.Model):
@@ -71,6 +75,8 @@ class Genre(models.Model):
         return self.name
 
     class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
         ordering = ['name']
 
 
@@ -82,14 +88,20 @@ class Category(models.Model):
         return self.name
 
     class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
         ordering = ['name']
 
 
 class Title(models.Model):
     name = models.CharField(max_length=256)
-    year = models.IntegerField()
+    year = models.IntegerField(validators=(validate_year, ))
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
-    genre = models.ManyToManyField(Genre, through='GenreTitle')
+    genre = models.ManyToManyField(
+        Genre,
+        related_name="titles",
+        verbose_name="Жанр",
+    )
     description = models.TextField(max_length=256, null=True)
     rating = models.IntegerField(
         verbose_name='Рейтинг (средняя оценка)',
@@ -101,22 +113,9 @@ class Title(models.Model):
         return self.name
 
     class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
         ordering = ['name']
-
-
-class GenreTitle(models.Model):
-    """Вспомогательная модель жанров произведения."""
-    title = models.ForeignKey(
-        Title,
-        on_delete=models.CASCADE,
-        verbose_name="Произведение")
-    genre = models.ForeignKey(
-        Genre,
-        on_delete=models.CASCADE,
-        verbose_name="Жанр")
-
-    class Meta:
-        verbose_name = "Жанр произведения"
 
 
 class Review(models.Model):
@@ -149,6 +148,8 @@ class Review(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
         ordering = ['pub_date']
         constraints = [
             models.UniqueConstraint(
@@ -185,6 +186,8 @@ class Comment(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
         ordering = ['pub_date']
 
     def __str__(self) -> str:

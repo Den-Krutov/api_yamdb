@@ -12,7 +12,7 @@ class SignUpSerializer(serializers.Serializer):
     username = serializers.SlugField(max_length=150)
 
     def validate_username(self, username):
-        if username == 'me':
+        if username.lower() == 'me':
             raise serializers.ValidationError('username не может быть me')
         return username
 
@@ -58,9 +58,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'first_name', 'last_name', 'bio']
 
 
-class AdminUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
+class AdminUserSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
         fields = [
             'username', 'email', 'first_name', 'last_name', 'bio', 'role']
 
