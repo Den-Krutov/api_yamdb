@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 def no_me_username_validator(username):
-    if username == 'me':
+    if username.lower() == 'me':
         raise ValidationError('username не может быть me')
 
 
