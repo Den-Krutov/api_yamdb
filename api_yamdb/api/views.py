@@ -43,11 +43,9 @@ class TokenView(GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            return Response(
-                data=serializer.validated_data, status=status.HTTP_200_OK)
+        serializer.is_valid(raise_exception=True)
         return Response(
-            data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            data=serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):
