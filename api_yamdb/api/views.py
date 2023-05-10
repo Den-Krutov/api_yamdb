@@ -43,11 +43,9 @@ class TokenView(GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            return Response(
-                data=serializer.validated_data, status=status.HTTP_200_OK)
+        serializer.is_valid(raise_exception=True)
         return Response(
-            data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            data=serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -81,6 +79,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.annotate(Avg('reviews__score')).order_by('name')
     permission_classes = [AdminOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
     pagination_class = PageNumberPagination
@@ -90,9 +89,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve'):
             return TitleSerializer
         return TitleWriteSerializer
-
-    def get_queryset(self):
-        return Title.objects.annotate(Avg('reviews__score')).order_by('name')
 
 
 class CategoryViewSet(CreateListDestroyViewSet):

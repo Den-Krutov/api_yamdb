@@ -1,11 +1,10 @@
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator as dtg
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import (
-    User, Genre, Category, Review, Title, Comment)
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -13,7 +12,7 @@ class SignUpSerializer(serializers.Serializer):
     username = serializers.SlugField(max_length=150)
 
     def validate_username(self, username):
-        if username == 'me':
+        if username.lower() == 'me':
             raise serializers.ValidationError('username не может быть me')
         return username
 
@@ -59,9 +58,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'first_name', 'last_name', 'bio']
 
 
-class AdminUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
+class AdminUserSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
         fields = [
             'username', 'email', 'first_name', 'last_name', 'bio', 'role']
 

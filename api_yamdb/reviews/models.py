@@ -1,14 +1,9 @@
 from django.contrib.auth import base_user, validators
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 from .validators import no_me_username_validator, validate_year
-
-ROLES = [
-    ('user', 'пользователь'), ('moderator', 'модератор'),
-    ('admin', 'администратор')]
-DEFAULT_USER_ROLE = ROLES[0][0]
 
 
 class UserManager(base_user.BaseUserManager):
@@ -24,8 +19,15 @@ class UserManager(base_user.BaseUserManager):
 
 
 class User(AbstractUser):
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+    ROLES = [
+        (USER, 'пользователь'),
+        (MODERATOR, 'модератор'),
+        (ADMIN, 'администратор'),
+    ]
     username_validator = validators.UnicodeUsernameValidator()
-
     username = models.CharField(
         'username',
         max_length=150,
@@ -42,7 +44,7 @@ class User(AbstractUser):
     bio = models.TextField(
         'Биография', blank=True, help_text='Введите биографию пользователя')
     role = models.CharField(
-        'Роль', max_length=64, choices=ROLES, default=DEFAULT_USER_ROLE,
+        'Роль', max_length=64, choices=ROLES, default=USER,
         help_text='Выберите роль пользователя')
 
     class Meta:
@@ -59,10 +61,10 @@ class User(AbstractUser):
         return self.username
 
     def is_admin(self):
-        return self.role == ROLES[2][0] or self.is_staff
+        return self.role == self.ADMIN or self.is_staff
 
     def is_moderator(self):
-        return self.role == ROLES[1][0]
+        return self.role == self.MODERATOR
 
 
 class Genre(models.Model):
